@@ -19,6 +19,8 @@ OR = 0b10101010
 SHL = 0b10101100
 SHR = 0b10101101
 XOR = 0b10101011
+PUSH = 0b01000101
+POP = 0b01000110
 
 
 class CPU:
@@ -30,7 +32,7 @@ class CPU:
         self.ram = [0] * 256
         # registers
         self.reg = [0] * 8
-        # reset stack pointer
+        # reset stack pointer - R7
         self.reg[7] = 0xF4
 
         # internal registers:
@@ -58,6 +60,8 @@ class CPU:
             SHL: self.alu,
             SHR: self.alu,
             XOR: self.alu,
+            PUSH: self.PUSH,
+            POP: self.POP,
         }
 
     def load(self):
@@ -213,3 +217,15 @@ class CPU:
     def PRN(self, operand_a):
         # print value stored in given register
         print(self.reg[operand_a])
+
+    def PUSH(self, reg_a):
+        # decrement sp
+        self.reg[7] -= 1
+        # copy value in the given register to the address pointed to by sp
+        self.ram[self.reg[7]] = self.reg[reg_a]
+
+    def POP(self, reg_a):
+        # copy the value from the address pointed to by sp to the given register
+        self.reg[reg_a] = self.ram[self.reg[7]]
+        # increment sp
+        self.reg[7] += 1
